@@ -12,7 +12,6 @@ describe('mongodb-mongoose/schema-model', () => {
   describe('модель категории', () => {
     it('у модели есть поля title и subcategories', () => {
       const fields = Category.schema.obj;
-
       expect(fields, 'у модели есть поле title').to.have.property('title');
       expect(fields, 'у модели есть поле subcategories').to.have.property('subcategories');
     });
@@ -26,7 +25,7 @@ describe('mongodb-mongoose/schema-model', () => {
 
     it('поле subcategories имеет правильную конфигурацию', () => {
       const subcategories = Category.schema.obj.subcategories;
-
+      console.log(subcategories);
       expect(subcategories, 'subcategories - массив').to.be.an('array');
 
       const title = subcategories[0].obj.title;

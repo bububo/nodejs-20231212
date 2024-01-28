@@ -1,16 +1,64 @@
-module.exports.productsBySubcategory = async function productsBySubcategory(ctx, next) {
+const Product = require('../models/Product');
+const mapProduct = require('../mappers/product');
+
+
+module.exports.products = async function products(ctx, next) {
   const {subcategory} = ctx.query;
 
-  if (!subcategory) return next();
+  const findQuery = {
+    ...(subcategory ? {subcategory} : {}),
+  };
 
-  ctx.body = {};
+  let foundProducts = [];
+  await Product.find(findQuery, (err, docs) => {
+    if (err) {
+      console.log(err);
+      ctx.status = 400;
+      ctx.body = {
+        message: 'invalid subcategory',
+      };
+      return;
+    } else {
+      foundProducts = docs;
+    }
+  }).clone().catch((err) =>{
+    console.log(err);
+  });
+  ctx.body = {products: foundProducts.map(mapProduct)};
 };
 
-module.exports.productList = async function productList(ctx, next) {
-  ctx.body = {};
-};
 
 module.exports.productById = async function productById(ctx, next) {
-  ctx.body = {};
+  const {id} = ctx.params;
+
+
+  if (!id) {
+    ctx.status = 400;
+    ctx.body = {
+      message: 'no product id',
+    };
+    return;
+  }
+
+  let foundProduct;
+  try {
+    foundProduct = await Product.findById(id);
+  } catch (e) {
+    ctx.status = 400;
+    ctx.body = {
+      message: 'invalid id',
+    };
+    return;
+  }
+  if (!foundProduct) {
+    ctx.status = 404;
+    ctx.body = {
+      message: 'not found',
+    };
+    return;
+  }
+
+
+  ctx.body = {product: mapProduct(foundProduct)};
 };
 
